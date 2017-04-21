@@ -128,6 +128,17 @@
  -  client.print(s);
  -  delay(1);
  -
- -
+ -  if (WiFi.status() != WL_CONNECTED) {
+ -    Serial.println("No connection. Retrying");
+ -    Serial.println();
+ -    Serial.println();
+ -    Serial.print("Connecting to ");
+ -    Serial.println(ssid);
+ -    WiFi.begin(ssid, password);
+ -    while (WiFi.status() != WL_CONNECTED) {
+ -      delay(500);
+ -      Serial.print(".");
+ -    }
+ -  }
  -  
  -}
