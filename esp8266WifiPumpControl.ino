@@ -2,8 +2,6 @@
  
  const char* ssid = "AP";
  const char* password = "passsword1";
- const char* ssid_work = "AP_work";
- const char* password_work = "password2";
  const int outputOff = 0;
  const int outputOn = 1;
  volatile char host; //This is the holder for the IP address, once issued by the AP
@@ -14,7 +12,6 @@
  void setup() {
    Serial.begin(9600);
    delay(10);
- Serial.println(WiFi.localIP());
    pinMode(ledPin, OUTPUT);
    digitalWrite(ledPin, HIGH);
  
@@ -26,18 +23,11 @@
    WiFi.begin(ssid, password);
    delay(10000);
  
-   if (WiFi.status() != WL_CONNECTED) {
-     Serial.println("No connection. Failing over to work WiFI");
-     Serial.println();
-     Serial.println();
-     Serial.print("Connecting to ");
-     Serial.println(ssid_work);
-     WiFi.begin(ssid_work, password_work);
-     while (WiFi.status() != WL_CONNECTED) {
-       delay(500);
-       Serial.print(".");
+   while (WiFi.status() != WL_CONNECTED) {
+     delay(500);
+     Serial.print(".");
      }
-   }
+   
    Serial.println("");
    Serial.println("WiFi connected");
  
@@ -128,17 +118,5 @@
    client.print(s);
    delay(1);
  
-   if (WiFi.status() != WL_CONNECTED) {
-     Serial.println("No connection. Retrying");
-     Serial.println();
-     Serial.println();
-     Serial.print("Connecting to ");
-     Serial.println(ssid);
-     WiFi.begin(ssid, password);
-     while (WiFi.status() != WL_CONNECTED) {
-       delay(500);
-       Serial.print(".");
-     }
    }
-   
- }
+}
