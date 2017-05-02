@@ -1,43 +1,84 @@
-//Deprecated file
-
 const int analogInPin = A1;
-const int drivingPin = 7;
-const int numReadings = 11;
+const int bottomPin = 7;
+const int topPin = 4;
 const int pumpPin = 2;
-int sensorValue = 0;
-int sensorAvg = 0;
+int reading;
+
+/*
+
+   topPin
+     |
+     |
+     \
+      || Resistor(47k)
+      /
+     |
+     |
+     ----- analogInPin
+     |
+     |
+     ----- probe 1
+
+     ----- probe 2
+     |
+     |
+     |
+   bottomPin
+
+*/
 
 void setup() {
 
  // put your setup code here, to run once:
  pinMode(LED_BUILTIN,OUTPUT);
- pinMode(drivingPin,OUTPUT);
+ pinMode(bottomPin,OUTPUT);
+ pinMode(topPin, OUTPUT);
  pinMode(pumpPin,OUTPUT);
  Serial.begin(9600);
+ Serial.println("Setup complete");
 }
 
+//---------------------------------
+
 void loop() {
- /* Reads the soil moisture sensor 10 times, then averages the reading to reduce analog read noise:*/
-for(int x = 0; x < numReadings; x++) {
-   digitalWrite(drivingPin,HIGH);
-   delay(4000);
-   sensorValue = sensorValue + analogRead(analogInPin);
-   digitalWrite(drivingPin,LOW);
-   Serial.println("Sensor number: ");
-   Serial.println(sensorValue);
- }
+ takeReading();
+ waterDecision(reading);
+}
 
-sensorAvg = (sensorValue/numReadings);
-Serial.println("Sensor average: ");
-Serial.println(sensorAvg);
+//---------------------------------
 
- if (sensorAvg < 900)
+void takeReading() 
+{
+digitalWrite(topPin, HIGH);
+digitalWrite(bottomPin, LOW);
+
+delay(1000);
+
+reading = analogRead(analogInPin);
+
+digitalWrite(topPin, LOW);
+digitalWrite(bottomPin, HIGH);
+
+delay(1000);
+
+digitalWrite(bottomPin, LOW);
+
+Serial.print("Reading: ");
+Serial.println(reading);
+
+return reading;
+}
+
+//---------------------------------
+
+void waterDecision(int value) {
+  if (value > 400)
  {
    digitalWrite(LED_BUILTIN,HIGH);
    digitalWrite(pumpPin,HIGH);
-   delay(30000);
+   delay(20000);
  }
- else if (sensorAvg >= 900 && sensorAvg < 1000)
+ else if (value >= 350 && value < 400)
  {
    digitalWrite(LED_BUILTIN,HIGH);
    delay(2000);
@@ -45,7 +86,7 @@ Serial.println(sensorAvg);
    digitalWrite(LED_BUILTIN,LOW);
    delay(3600000);
  }
- else if (sensorAvg >= 1000)
+ else if (value <= 350)
  {
    digitalWrite(LED_BUILTIN,HIGH);
    delay(2000);
@@ -53,6 +94,4 @@ Serial.println(sensorAvg);
    digitalWrite(LED_BUILTIN,LOW);
    delay(7200000);
  }
-
- sensorValue = 0;
 }
